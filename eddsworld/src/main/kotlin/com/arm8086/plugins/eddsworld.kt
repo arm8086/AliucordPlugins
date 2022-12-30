@@ -15,7 +15,7 @@ import com.discord.api.commands.ApplicationCommandType
 import com.discord.api.utcdatetime.UtcDateTime
 import org.jsoup.Jsoup
 
-@AliucordPlugin
+@AliucordPlugin(requiresRestart=false)
 class eddsworld : Plugin() {
     @SuppressLint("SetTextI18n", "SimpleDateFormat")
     override fun start(ctx: Context) {
@@ -34,17 +34,15 @@ class eddsworld : Plugin() {
             "ewc",
             "View a comic from eddsworld.co.uk",
             listOf(comicNum)
-        ) { cctx: CommandContext ->
+        ) { cctx ->
             val comicNumber = cctx.getLong("num")
             var comic
             if (comicNumber == null) { // idk if it returns null or 0 if empty
-                logger.error(throwable)
                 return@registerCommand CommandsAPI.CommandResult("Invalid number")
             } else {
                 comic = try {
                     Jsoup.connect("$url/comic/$comicNumber").get()
-                } catch (throwable: Throwable) {
-                    logger.error(throwable)
+                } catch (throwable) {
                     return@registerCommand CommandsAPI.CommandResult("Cant get comic")
                 }
                 val imgSrc = comic.select(".comic").absUrl("src")
