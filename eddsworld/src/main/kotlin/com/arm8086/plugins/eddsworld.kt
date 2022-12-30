@@ -13,17 +13,12 @@ import com.aliucord.entities.MessageEmbedBuilder
 import com.aliucord.entities.Plugin
 import com.discord.api.commands.ApplicationCommandType
 import com.discord.api.utcdatetime.UtcDateTime
-import com.lytefast.flexinput.R
-import java.text.SimpleDateFormat
-import org.jsoup
+import org.jsoup.Jsoup
 
 @AliucordPlugin
 class eddsworld : Plugin() {
-
-    var pluginIcon: Drawable? = null
     @SuppressLint("SetTextI18n", "SimpleDateFormat")
     override fun start(ctx: Context) {
-        pluginIcon = ContextCompat.getDrawable(Utils.appContext, R.e.ic_search)
         val url = "https://eddsworld.co.uk"
         val comicNum = Utils.createCommandOption(
             ApplicationCommandType.NUMBER,
@@ -36,21 +31,21 @@ class eddsworld : Plugin() {
             choices = emptyList(), subCommandOptions = emptyList(), autocomplete = false
         )
         commands.registerCommand(
-            "edds",
+            "ewc",
             "View a comic from eddsworld.co.uk",
             listOf(comicNum)
         ) { cctx: CommandContext ->
             val comicNumber = cctx.getLong("num")
-            val comic: Document
+            var comic
             if (comicNumber == null) { // idk if it returns null or 0 if empty
                 logger.error(throwable)
-                return@registerCommand CommandsAPI.CommandResult("Well the comic couldn't be fetched, sorry lol")
+                return@registerCommand CommandsAPI.CommandResult("Invalid number")
             } else {
                 comic = try {
                     Jsoup.connect("$url/comic/$comicNumber").get()
                 } catch (throwable: Throwable) {
                     logger.error(throwable)
-                    return@registerCommand CommandsAPI.CommandResult("Well the comic couldn't be fetched, sorry lol")
+                    return@registerCommand CommandsAPI.CommandResult("Cant get comic")
                 }
                 val imgSrc = comic.select(".comic").absUrl("src")
                 val alt = comic.select(".comic").attr("alt")
